@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cross-Stitch Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&family=Silkscreen:wght@400;700&family=Pixelify+Sans:wght@400;700&family=VT323&family=Press+Start+2P&family=Bebas+Neue&family=Roboto+Slab:wght@400;700&family=Playfair+Display:wght@400;700&family=Lobster&family=Pacifico&family=Great+Vibes&family=Caveat:wght@400;700&family=Dancing+Script:wght@400;700&family=Cinzel:wght@400;700&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --linen:#f4efe4; --paper:#fbf8f2; --ink:#2b2622; --muted:#7a6f63; --line:#ddd3c2;
+    --accent:#b0413e; --accent-soft:#f3dcd8; --thread:#3e6b5a;
+    --radius:10px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{font-family:Inter,system-ui,sans-serif;color:var(--ink);background:var(--linen);font-size:14px;
+    background-image:radial-gradient(rgba(0,0,0,.035) 1px,transparent 1px);background-size:6px 6px}
+  header{display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid var(--line);background:var(--paper)}
+  header h1{font-family:Fraunces,serif;font-weight:700;font-size:22px;margin:0;letter-spacing:-.01em}
+  header h1 span{color:var(--accent)}
+  header .sub{color:var(--muted);font-size:13px}
+  .hunits{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);font-weight:500}
+  .hunits .seg button{padding:5px 12px;white-space:nowrap}
+  .tabs{display:flex;gap:4px;background:var(--linen);padding:4px;border-radius:999px;border:1px solid var(--line)}
+  .tabs button{border:0;background:none;padding:7px 14px;border-radius:999px;font:inherit;font-weight:500;color:var(--muted);cursor:pointer}
+  .tabs button.on{background:var(--ink);color:#fff}
+  main{display:grid;grid-template-columns:250px 1fr 300px;gap:0;height:calc(100% - 63px)}
+  aside{background:var(--paper);overflow:auto;padding:16px}
+  aside.left{border-right:1px solid var(--line)}
+  aside.right{border-left:1px solid var(--line)}
+  h2{font-family:Fraunces,serif;font-size:15px;font-weight:600;margin:18px 0 8px}
+  h2:first-child{margin-top:0}
+  label{display:block;font-size:12px;color:var(--muted);margin:8px 0 4px;font-weight:500}
+  input[type=number],input[type=text],select,textarea{width:100%;padding:7px 9px;border:1px solid var(--line);border-radius:7px;background:#fff;font:inherit;color:var(--ink)}
+  textarea{font-family:ui-monospace,monospace;font-size:11px;height:120px;resize:vertical}
+  .row{display:flex;gap:8px;align-items:flex-end}
+  .row>*{flex:1}
+  .btn{border:1px solid var(--line);background:#fff;padding:7px 10px;border-radius:7px;font:inherit;font-weight:500;cursor:pointer;color:var(--ink)}
+  .btn:hover{border-color:var(--muted)}
+  .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .btn.full{width:100%;margin-top:8px}
+  .tools{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+  .tool{border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 4px;cursor:pointer;font:inherit;font-size:12px;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--ink)}
+  .tool svg{width:18px;height:18px}
+  .tool.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .toggle{display:flex;align-items:center;gap:8px;font-size:13px;margin:6px 0;cursor:pointer}
+  .palette{display:flex;flex-direction:column;gap:4px;margin-top:6px}
+  .sw{display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:7px;border:1px solid transparent;cursor:pointer}
+  .sw:hover{background:var(--linen)}
+  .sw.on{border-color:var(--ink);background:#fff}
+  .chip{width:24px;height:24px;border-radius:5px;border:1px solid rgba(0,0,0,.15);display:grid;place-items:center;font-size:12px;font-weight:600;flex:none;position:relative;overflow:hidden}
+  .chip input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+  .sw .nm{flex:1;min-width:0;border:0;background:none;font:inherit;padding:2px;color:var(--ink)}
+  .sw .nm:focus{outline:1px solid var(--line);background:#fff;border-radius:4px}
+  .sw .ct{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .sw .x{border:0;background:none;color:var(--muted);cursor:pointer;font-size:15px;padding:0 2px}
+  .center{display:flex;flex-direction:column;min-width:0;min-height:0}
+  .bar{display:flex;gap:8px;align-items:center;padding:8px 14px;border-bottom:1px solid var(--line);background:rgba(251,248,242,.8);flex-wrap:wrap}
+  .bar .info{color:var(--muted);font-size:12px;margin-left:auto;font-variant-numeric:tabular-nums}
+  .stage{flex:1;overflow:auto;padding:24px;min-height:0}
+  .hoop{display:inline-block;padding:14px;background:#fff;border-radius:6px;box-shadow:0 1px 2px rgba(0,0,0,.08),0 8px 30px rgba(60,40,20,.10)}
+  canvas#c{display:block;touch-action:none;cursor:crosshair}
+  .result{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-top:10px}
+  .result .big{font-family:Fraunces,serif;font-size:26px;font-weight:700;line-height:1.1}
+  .result .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+  .result .small{font-size:12px;color:var(--muted);margin-top:4px}
+  .result + .result{margin-top:8px}
+  .result.cut{border-color:var(--accent);background:var(--accent-soft)}
+  table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px;font-variant-numeric:tabular-nums}
+  th,td{text-align:left;padding:5px 4px;border-bottom:1px solid var(--line)}
+  th{color:var(--muted);font-weight:600;font-size:11px}
+  tr.sel td{background:var(--accent-soft);font-weight:600}
+  .note{font-size:12px;color:var(--muted);line-height:1.5}
+  .seg{display:flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}
+  .seg button{flex:1;border:0;background:#fff;padding:7px;font:inherit;cursor:pointer;color:var(--ink)}
+  .seg button.on{background:var(--ink);color:#fff}
+  .modal{position:fixed;inset:0;background:rgba(30,25,20,.45);display:none;align-items:center;justify-content:center;z-index:10;padding:20px}
+  .modal.open{display:flex}
+  .modal .box{background:var(--paper);border-radius:12px;padding:20px;max-width:640px;width:100%;max-height:90vh;overflow:auto}
+  .modal img{max-width:100%;border:1px solid var(--line);background:#fff}
+  .modal h3{font-family:Fraunces,serif;margin:0 0 10px}
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:8px 16px;border-radius:999px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:20}
+  .toast.show{opacity:1}
+  @media (max-width:1000px){
+    main{grid-template-columns:1fr;height:auto}
+    aside.left,aside.right{border:0;border-bottom:1px solid var(--line)}
+    .stage{height:65vh}
+    body[data-view=calc] aside.left, body[data-view=calc] .center{display:none}
+    body[data-view=edit] aside.right{display:none}
+    header{flex-wrap:wrap}
+  }
+  @media (min-width:1001px){ .tabs{display:none} }
+</style>
+</head>
+<body data-view="edit">
+<header>
+  <h1>Cross-Stitch <span>Studio</span></h1>
+  <div class="sub">Design patterns · size your fabric</div>
+  <div class="hunits">Units
+    <div class="seg" id="unitSeg"><button data-v="cm">Metric</button><button data-v="in">Inches</button></div>
+  </div>
+  <div class="tabs">
+    <button data-view="edit" class="on">Pattern</button>
+    <button data-view="calc">Fabric calculator</button>
+  </div>
+</header>
+
+<main>
+  <!-- LEFT: tools + palette -->
+  <aside class="left">
+    <h2>Tools</h2>
+    <div class="tools" id="tools">
+      <button class="tool on" data-tool="draw" title="Stitch (D)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 5l14 14M19 5L5 19"/></svg>Stitch</button>
+      <button class="tool" data-tool="erase" title="Unpick (E)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 16l8-8 6 6-5 5H8z"/><path d="M13 19h7"/></svg>Unpick</button>
+      <button class="tool" data-tool="fill" title="Fill (F)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 11l6-6 7 7-6 6z"/><path d="M19 15s2 2.5 2 4a2 2 0 01-4 0c0-1.5 2-4 2-4z"/></svg>Fill</button>
+      <button class="tool" data-tool="pick" title="Pick color (I)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4l6 6-9 9H5v-6z"/></svg>Pick</button>
+      <button class="tool" data-tool="line" title="Line (L)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 19L19 5"/></svg>Line</button>
+      <button class="tool" data-tool="pan" title="Move view (H)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M3 12h18M12 3l-3 3M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3"/></svg>Move</button>
+      <button class="tool" data-tool="text" title="Place text (T)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 6V4h14v2M12 4v16M9 20h6"/></svg>Text</button>
+    </div>
+    <label class="toggle"><input type="checkbox" id="mirrorX"> Mirror left ↔ right</label>
+    <label class="toggle"><input type="checkbox" id="mirrorY"> Mirror top ↕ bottom</label>
+    <label class="toggle"><input type="checkbox" id="showSym" checked> Show symbols</label>
+
+    <h2>Threads</h2>
+    <div class="palette" id="palette"></div>
+    <button class="btn full" id="addColor">+ Add thread color</button>
+
+    <h2>Text</h2>
+    <textarea id="txt" style="height:56px;font-family:Inter,sans-serif;font-size:13px" placeholder="Type your words…">Home Sweet Home</textarea>
+    <label>Font</label>
+    <select id="txtFont">
+      <optgroup label="Pixel (crisp at small sizes)">
+        <option value="Silkscreen">Silkscreen</option>
+        <option value="Pixelify Sans">Pixelify Sans</option>
+        <option value="VT323">VT323 (typewriter)</option>
+        <option value="Press Start 2P">Press Start (blocky)</option>
+      </optgroup>
+      <optgroup label="Print">
+        <option value="Inter">Sans</option>
+        <option value="Bebas Neue">Bebas (tall caps)</option>
+        <option value="Roboto Slab">Slab serif</option>
+        <option value="Playfair Display">Elegant serif</option>
+        <option value="Cinzel">Roman capitals</option>
+        <option value="UnifrakturMaguntia">Gothic blackletter</option>
+      </optgroup>
+      <optgroup label="Script (use 12+ stitches)">
+        <option value="Lobster">Lobster</option>
+        <option value="Pacifico">Pacifico</option>
+        <option value="Dancing Script">Dancing Script</option>
+        <option value="Great Vibes">Great Vibes</option>
+        <option value="Caveat">Handwritten</option>
+      </optgroup>
+    </select>
+    <div class="row">
+      <div><label>Letter height</label><input type="number" id="txtH" value="9" min="4" max="80" title="Height of a capital letter, in stitches"></div>
+      <div><label>Letter gap</label><input type="number" id="txtSp" value="0" min="-2" max="10" title="0 = the font's natural spacing (keeps script letters joined)"></div>
+      <div><label>Line gap</label><input type="number" id="txtLg" value="3" min="0" max="30"></div>
+    </div>
+    <label>Thickness</label>
+    <input type="range" id="txtThick" min="1" max="5" value="3" style="width:100%">
+    <div class="row" style="align-items:center">
+      <label class="toggle" style="flex:0 0 auto"><input type="checkbox" id="txtBold"> Bold</label>
+      <div class="seg" id="alignSeg"><button data-v="left">Left</button><button data-v="center" class="on">Center</button><button data-v="right">Right</button></div>
+    </div>
+    <div class="result" style="padding:8px;margin-top:8px">
+      <canvas id="txtPrev" style="max-width:100%;display:block;image-rendering:pixelated"></canvas>
+      <div class="small" id="txtInfo"></div>
+    </div>
+    <div class="row">
+      <button class="btn primary" id="txtPlace">Click to place</button>
+      <button class="btn" id="txtCenter">Put in center</button>
+    </div>
+    <p class="note" style="margin-top:6px">Letter height is the height of a capital letter, in stitches. Text uses the selected thread color.</p>
+
+    <h2>Canvas</h2>
+    <div class="row">
+      <div><label>Width (stitches)</label><input type="number" id="gw" min="5" max="400"></div>
+      <div><label>Height</label><input type="number" id="gh" min="5" max="400"></div>
+    </div>
+    <button class="btn full" id="resize">Resize canvas</button>
+    <label>Aida color (preview)</label>
+    <select id="clothColor">
+      <option value="#ffffff">White</option>
+      <option value="#f5eedc">Antique white</option>
+      <option value="#efe3c8">Natural linen</option>
+      <option value="#dfe7ee">Pale blue</option>
+      <option value="#2b2b2b">Black</option>
+    </select>
+
+    <h2>Pattern from a picture</h2>
+    <p class="note">Turn a photo or drawing into a stitch pattern sized to your canvas width.</p>
+    <div class="row">
+      <div><label>Colors</label><input type="number" id="imgColors" value="8" min="2" max="40"></div>
+      <div><label>Width</label><input type="number" id="imgWidth" value="60" min="10" max="300"></div>
+    </div>
+    <input type="file" id="imgFile" accept="image/*" style="margin-top:8px;font-size:12px;width:100%">
+
+    <h2>Save &amp; share</h2>
+    <p class="note">Your work autosaves in this browser. To keep it elsewhere, copy the pattern code.</p>
+    <div class="row">
+      <button class="btn" id="exportBtn">Copy code</button>
+      <button class="btn" id="importBtn">Load code</button>
+    </div>
+    <button class="btn full" id="chartBtn">Printable chart image</button>
+    <button class="btn full" id="clearBtn">Clear pattern</button>
+  </aside>
+
+  <!-- CENTER: editor -->
+  <section class="center">
+    <div class="bar">
+      <button class="btn" id="undo" title="Undo (Ctrl+Z)">↶ Undo</button>
+      <button class="btn" id="redo" title="Redo (Ctrl+Y)">↷ Redo</button>
+      <span style="width:8px"></span>
+      <button class="btn" id="zoomOut">−</button>
+      <span id="zoomLbl" style="min-width:44px;text-align:center">16px</span>
+      <button class="btn" id="zoomIn">+</button>
+      <span class="info" id="info"></span>
+    </div>
+    <div class="stage" id="stage"><div class="hoop"><canvas id="c"></canvas></div></div>
+  </section>
+
+  <!-- RIGHT: calculator -->
+  <aside class="right">
+    <h2>Fabric calculator</h2>
+    <label>Fabric</label>
+    <select id="fabric">
+      <optgroup label="Aida (1 stitch per block)">
+        <option value="aida-11">Aida 11 count</option>
+        <option value="aida-14" selected>Aida 14 count</option>
+        <option value="aida-16">Aida 16 count</option>
+        <option value="aida-18">Aida 18 count</option>
+        <option value="aida-20">Aida 20 count</option>
+        <option value="aida-22">Hardanger 22 count</option>
+      </optgroup>
+      <optgroup label="Evenweave / Linen (usually over 2)">
+        <option value="even-25">Evenweave 25 count</option>
+        <option value="even-28">Evenweave 28 count</option>
+        <option value="even-32">Linen 32 count</option>
+        <option value="even-36">Linen 36 count</option>
+        <option value="even-40">Linen 40 count</option>
+      </optgroup>
+      <option value="custom">Custom count…</option>
+    </select>
+    <div class="row" id="customRow" style="display:none">
+      <div><label id="customLbl">Threads per inch</label><input type="number" id="customCount" value="14" min="1" max="60" step="0.1"></div>
+    </div>
+    <label>Stitch over</label>
+    <div class="seg" id="overSeg"><button data-v="1" class="on">1 thread</button><button data-v="2">2 threads</button></div>
+
+    <label>Pattern size from</label>
+    <div class="seg" id="srcSeg"><button data-v="canvas" class="on">Whole canvas</button><button data-v="used">Stitched area</button><button data-v="manual">Type it</button></div>
+    <div class="row" id="manualRow" style="display:none">
+      <div><label>Stitches wide</label><input type="number" id="mw" value="100" min="1"></div>
+      <div><label>Stitches high</label><input type="number" id="mh" value="80" min="1"></div>
+    </div>
+
+    <label id="marginLbl">Extra margin on each side</label>
+    <input type="number" id="margin" value="3" min="0" step="0.25">
+    <p class="note" style="margin-top:4px" id="marginNote"></p>
+
+    <div class="result">
+      <div class="lbl">Pattern</div>
+      <div class="big" id="rStitches">–</div>
+      <div class="small" id="rDensity"></div>
+    </div>
+    <div class="result">
+      <div class="lbl">Finished design size</div>
+      <div class="big" id="rDesign">–</div>
+    </div>
+    <div class="result cut">
+      <div class="lbl">Cut your fabric at least</div>
+      <div class="big" id="rCut">–</div>
+      <div class="small" id="rCutExact"></div>
+    </div>
+
+    <h2>Compare fabrics</h2>
+    <table id="cmp"><thead><tr><th>Fabric</th><th>Design</th><th>Cut</th></tr></thead><tbody></tbody></table>
+    <p class="note" style="margin-top:10px">How it works: stitches per inch = fabric count ÷ threads stitched over. Design size = stitches ÷ stitches per inch. Fabric = design + 2 × margin, rounded up.</p>
+  </aside>
+</main>
+
+<div class="modal" id="modal"><div class="box" id="modalBox"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  const SYMBOLS = "●▲■◆★✚✖♥◐▼○△□◇☆♦♣♠ABCDEFGHJKLMNPRSTUVWXYZ23456789".split("");
+  const DEFAULT_PALETTE = [
+    {color:"#b0413e",name:"Cranberry"},{color:"#3e6b5a",name:"Forest"},
+    {color:"#e2b23c",name:"Mustard"},{color:"#3b5b8c",name:"Delft blue"},
+    {color:"#2b2622",name:"Charcoal"},{color:"#f2c6c2",name:"Blush"}
+  ];
+  const $ = id => document.getElementById(id);
+  const cv = $("c"), ctx = cv.getContext("2d");
+
+  let S = {
+    w: 50, h: 40, grid: null,
+    palette: DEFAULT_PALETTE.map((p,i)=>({...p, symbol:SYMBOLS[i]})),
+    cur: 0, tool: "draw", zoom: 16, cloth: "#ffffff",
+    calc: {fabric:"aida-14", custom:14, over:1, src:"canvas", mw:100, mh:80, unit:"cm", margin:7.5}
+  };
+  if(/^en-(US|LR)/i.test(navigator.language||"")){ S.calc.unit="in"; S.calc.margin=3; }
+  S.grid = new Array(S.w*S.h).fill(-1);
+  let undoStack = [], redoStack = [];
+
+  // ---------- persistence ----------
+  function save(){
+    try { localStorage.setItem("xstitch-v1", JSON.stringify(serialize(true))); } catch(e){}
+  }
+  function serialize(full){
+    const o = {v:1, w:S.w, h:S.h, palette:S.palette, grid:rle(S.grid)};
+    if(full){ o.cloth=S.cloth; o.calc=S.calc; o.zoom=S.zoom; }
+    return o;
+  }
+  function rle(a){ const out=[]; let i=0; while(i<a.length){ let j=i; while(j<a.length&&a[j]===a[i]) j++; out.push(a[i], j-i); i=j; } return out; }
+  function unrle(r,n){ const a=[]; for(let i=0;i<r.length;i+=2) for(let k=0;k<r[i+1];k++) a.push(r[i]); while(a.length<n)a.push(-1); return a.slice(0,n); }
+  function load(o){
+    if(!o||!o.w||!o.h||!Array.isArray(o.palette)) throw new Error("bad");
+    S.w=o.w; S.h=o.h; S.palette=o.palette.map((p,i)=>({color:p.color,name:p.name||"Thread "+(i+1),symbol:p.symbol||SYMBOLS[i%SYMBOLS.length]}));
+    S.grid=unrle(o.grid,S.w*S.h);
+    if(o.cloth) S.cloth=o.cloth;
+    if(o.calc) S.calc=Object.assign(S.calc,o.calc);
+    if(o.zoom) S.zoom=o.zoom;
+    S.cur=Math.min(S.cur,S.palette.length-1);
+  }
+  try { const raw=localStorage.getItem("xstitch-v1"); if(raw) load(JSON.parse(raw)); } catch(e){}
+
+  // ---------- render ----------
+  let rafPending=false;
+  function render(){ if(rafPending) return; rafPending=true; requestAnimationFrame(()=>{rafPending=false; draw();}); }
+  function lum(hex){ const n=parseInt(hex.slice(1),16); const r=n>>16,g=(n>>8)&255,b=n&255; return (0.299*r+0.587*g+0.114*b)/255; }
+  let preview=null; // line preview cells
+  function draw(target=ctx, z=S.zoom, opts={}){
+    const W=S.w*z, H=S.h*z;
+    const c=target.canvas;
+    if(c.width!==W||c.height!==H){ c.width=W; c.height=H; }
+    target.fillStyle=opts.white?"#fff":S.cloth; target.fillRect(0,0,W,H);
+    const sym = opts.symbols ?? $("showSym").checked;
+    target.textAlign="center"; target.textBaseline="middle";
+    target.font=`600 ${Math.max(7,Math.floor(z*0.62))}px Inter,sans-serif`;
+    const drawCell=(x,y,ci,alpha)=>{
+      const p=S.palette[ci]; if(!p) return;
+      if(opts.symbolOnly){
+        target.fillStyle="#222"; target.fillText(p.symbol,x*z+z/2,y*z+z/2+1); return;
+      }
+      target.globalAlpha=alpha||1;
+      target.fillStyle=p.color; target.fillRect(x*z,y*z,z,z);
+      target.globalAlpha=1;
+      if(sym && z>=10){ target.fillStyle=lum(p.color)>0.55?"rgba(0,0,0,.65)":"rgba(255,255,255,.85)"; target.fillText(p.symbol,x*z+z/2,y*z+z/2+1); }
+    };
+    for(let y=0;y<S.h;y++) for(let x=0;x<S.w;x++){ const ci=S.grid[y*S.w+x]; if(ci>=0) drawCell(x,y,ci); }
+    if(preview && target===ctx) for(const [x,y] of preview) drawCell(x,y,S.cur,0.6);
+    // grid
+    const dark = lum(S.cloth)<0.4 && !opts.white;
+    if(z>=5){
+      target.lineWidth=1; target.strokeStyle=dark?"rgba(255,255,255,.12)":"rgba(0,0,0,.10)";
+      target.beginPath();
+      for(let x=0;x<=S.w;x++){ if(x%10){ target.moveTo(x*z+.5,0); target.lineTo(x*z+.5,H);} }
+      for(let y=0;y<=S.h;y++){ if(y%10){ target.moveTo(0,y*z+.5); target.lineTo(W,y*z+.5);} }
+      target.stroke();
+    }
+    target.strokeStyle=dark?"rgba(255,255,255,.35)":"rgba(0,0,0,.38)"; target.lineWidth=1;
+    target.beginPath();
+    for(let x=0;x<=S.w;x+=10){ const px=Math.min(x*z,W-1)+.5; target.moveTo(px,0); target.lineTo(px,H); }
+    for(let y=0;y<=S.h;y+=10){ const py=Math.min(y*z,H-1)+.5; target.moveTo(0,py); target.lineTo(W,py); }
+    target.moveTo(W-.5,0); target.lineTo(W-.5,H); target.moveTo(0,H-.5); target.lineTo(W,H-.5);
+    target.stroke();
+    // center markers
+    if(target===ctx){
+      target.fillStyle=S.palette.length?"#b0413e":"#000";
+      const cx=Math.floor(S.w/2)*z, cy=Math.floor(S.h/2)*z;
+      target.beginPath(); target.moveTo(cx-4,0); target.lineTo(cx+4,0); target.lineTo(cx,6); target.fill();
+      target.beginPath(); target.moveTo(0,cy-4); target.lineTo(0,cy+4); target.lineTo(6,cy); target.fill();
+    }
+  }
+
+  // ---------- palette UI ----------
+  function counts(){ const c=new Array(S.palette.length).fill(0); for(const v of S.grid) if(v>=0) c[v]++; return c; }
+  function renderPalette(){
+    const el=$("palette"); el.innerHTML="";
+    const ct=counts();
+    S.palette.forEach((p,i)=>{
+      const d=document.createElement("div"); d.className="sw"+(i===S.cur?" on":"");
+      d.innerHTML=`<div class="chip" style="background:${p.color};color:${lum(p.color)>0.55?'#000':'#fff'}">${p.symbol}<input type="color" value="${p.color}" title="Change color"></div>
+        <input class="nm" value="${p.name.replace(/"/g,'&quot;')}" title="Rename (e.g. DMC number)">
+        <span class="ct">${ct[i]}</span><button class="x" title="Remove thread">×</button>`;
+      d.addEventListener("click",e=>{ if(e.target.closest(".x")||e.target.tagName==="INPUT") return; S.cur=i; if(S.tool==="erase"||S.tool==="pick"||S.tool==="pan") setTool("draw"); renderPalette(); });
+      d.querySelector(".chip").addEventListener("click",()=>{ S.cur=i; renderPaletteSoon(); });
+      d.querySelector("input[type=color]").addEventListener("input",e=>{ p.color=e.target.value; d.querySelector(".chip").style.background=p.color; render(); save(); });
+      d.querySelector("input[type=color]").addEventListener("change",()=>renderPalette());
+      d.querySelector(".nm").addEventListener("change",e=>{ p.name=e.target.value; save(); });
+      d.querySelector(".nm").addEventListener("focus",()=>{ if(S.cur!==i){ S.cur=i; document.querySelectorAll("#palette .sw").forEach((s,j)=>s.classList.toggle("on",j===i)); } });
+      d.querySelector(".x").addEventListener("click",()=>removeColor(i));
+      el.appendChild(d);
+    });
+  }
+  const _rp=renderPalette; renderPalette=function(){ _rp(); try{ drawTxtPreview(); }catch(e){} };
+  let palT; function renderPaletteSoon(){ clearTimeout(palT); palT=setTimeout(renderPalette,150); }
+  function removeColor(i){
+    const used=S.grid.some(v=>v===i);
+    if(used){ confirmBox(`Remove “${S.palette[i].name}”? Its stitches will be unpicked.`, ()=>doRemove(i)); } else doRemove(i);
+  }
+  function doRemove(i){
+    pushUndo();
+    S.palette.splice(i,1);
+    S.grid=S.grid.map(v=>v===i?-1:(v>i?v-1:v));
+    S.cur=Math.max(0,Math.min(S.cur,S.palette.length-1));
+    afterChange();
+  }
+  $("addColor").onclick=()=>{
+    const used=new Set(S.palette.map(p=>p.symbol));
+    const symbol=SYMBOLS.find(s=>!used.has(s))||"?";
+    const hue=Math.floor(Math.random()*360);
+    S.palette.push({color:hslHex(hue,55,50),name:"Thread "+(S.palette.length+1),symbol});
+    S.cur=S.palette.length-1; renderPalette(); save();
+  };
+  function hslHex(h,s,l){ s/=100;l/=100; const k=n=>(n+h/30)%12, a=s*Math.min(l,1-l); const f=n=>l-a*Math.max(-1,Math.min(k(n)-3,Math.min(9-k(n),1))); return "#"+[f(0),f(8),f(4)].map(x=>Math.round(x*255).toString(16).padStart(2,"0")).join(""); }
+
+  // ---------- tools ----------
+  function setTool(t){ if(S.tool==="text"&&t!=="text"){ preview=null; render(); } S.tool=t; document.querySelectorAll(".tool").forEach(b=>b.classList.toggle("on",b.dataset.tool===t)); cv.style.cursor=t==="pan"?"grab":"crosshair"; }
+  document.querySelectorAll(".tool").forEach(b=>b.onclick=()=>setTool(b.dataset.tool));
+
+  function pushUndo(){ undoStack.push({grid:S.grid.slice(),palette:JSON.parse(JSON.stringify(S.palette)),w:S.w,h:S.h}); if(undoStack.length>80) undoStack.shift(); redoStack=[]; }
+  function restore(st){ S.grid=st.grid; S.palette=st.palette; S.w=st.w; S.h=st.h; S.cur=Math.min(S.cur,Math.max(0,S.palette.length-1)); syncDims(); afterChange(); }
+  $("undo").onclick=()=>{ if(!undoStack.length) return; redoStack.push({grid:S.grid.slice(),palette:JSON.parse(JSON.stringify(S.palette)),w:S.w,h:S.h}); restore(undoStack.pop()); };
+  $("redo").onclick=()=>{ if(!redoStack.length) return; undoStack.push({grid:S.grid.slice(),palette:JSON.parse(JSON.stringify(S.palette)),w:S.w,h:S.h}); restore(redoStack.pop()); };
+
+  function mirrors(x,y){
+    const pts=[[x,y]]; const mx=$("mirrorX").checked, my=$("mirrorY").checked;
+    if(mx) pts.push([S.w-1-x,y]); if(my) pts.push([x,S.h-1-y]); if(mx&&my) pts.push([S.w-1-x,S.h-1-y]);
+    return pts;
+  }
+  function setCell(x,y,v){ for(const [a,b] of mirrors(x,y)) if(a>=0&&b>=0&&a<S.w&&b<S.h) S.grid[b*S.w+a]=v; }
+  function flood(x,y,v){
+    const target=S.grid[y*S.w+x]; if(target===v) return;
+    const st=[[x,y]];
+    while(st.length){ const [a,b]=st.pop(); if(a<0||b<0||a>=S.w||b>=S.h) continue; const i=b*S.w+a; if(S.grid[i]!==target) continue; S.grid[i]=v; st.push([a+1,b],[a-1,b],[a,b+1],[a,b-1]); }
+  }
+  function lineCells(x0,y0,x1,y1){ const out=[]; const dx=Math.abs(x1-x0), dy=-Math.abs(y1-y0), sx=x0<x1?1:-1, sy=y0<y1?1:-1; let e=dx+dy; for(;;){ out.push([x0,y0]); if(x0===x1&&y0===y1) break; const e2=2*e; if(e2>=dy){e+=dy;x0+=sx;} if(e2<=dx){e+=dx;y0+=sy;} } return out; }
+
+  function cellAt(ev){ const r=cv.getBoundingClientRect(); const x=Math.floor((ev.clientX-r.left)/r.width*S.w), y=Math.floor((ev.clientY-r.top)/r.height*S.h); return [x,y]; }
+  let down=false, last=null, lineStart=null, panStart=null;
+  cv.addEventListener("pointerdown",ev=>{
+    ev.preventDefault(); cv.setPointerCapture(ev.pointerId); down=true;
+    const [x,y]=cellAt(ev);
+    if(S.tool==="pan"){ const st=$("stage"); panStart={x:ev.clientX,y:ev.clientY,sl:st.scrollLeft,stp:st.scrollTop}; cv.style.cursor="grabbing"; return; }
+    if(S.tool==="pick"){ const v=S.grid[y*S.w+x]; if(v>=0){ S.cur=v; renderPalette(); setTool("draw"); } return; }
+    if(S.tool==="text"){ down=false; stampAt(x,y); return; }
+    const val = S.tool==="erase"?-1:S.cur;
+    if(val>=0 && !S.palette.length) return toast("Add a thread color first");
+    pushUndo();
+    if(S.tool==="fill"){ flood(x,y,val); afterChange(); down=false; return; }
+    if(S.tool==="line"){ lineStart=[x,y]; preview=[[x,y]]; render(); return; }
+    setCell(x,y,val); last=[x,y]; render();
+  });
+  cv.addEventListener("pointermove",ev=>{
+    const [x,y]=cellAt(ev);
+    if(x>=0&&y>=0&&x<S.w&&y<S.h) $("info").textContent=`Stitch ${x+1}, ${y+1}`;
+    if(S.tool==="text"){ showStampPreview(x,y); return; }
+    if(!down) return;
+    if(S.tool==="pan"&&panStart){ const st=$("stage"); st.scrollLeft=panStart.sl-(ev.clientX-panStart.x); st.scrollTop=panStart.stp-(ev.clientY-panStart.y); return; }
+    if(S.tool==="line"&&lineStart){ preview=lineCells(lineStart[0],lineStart[1],x,y).flatMap(([a,b])=>mirrors(a,b)); render(); return; }
+    if(S.tool==="draw"||S.tool==="erase"){
+      const val=S.tool==="erase"?-1:S.cur;
+      for(const [a,b] of lineCells(last[0],last[1],x,y)) setCell(a,b,val);
+      last=[x,y]; render();
+    }
+  });
+  const up=ev=>{
+    if(!down) return; down=false;
+    if(S.tool==="pan"){ panStart=null; cv.style.cursor="grab"; return; }
+    if(S.tool==="line"&&lineStart){ const [x,y]=cellAt(ev); for(const [a,b] of lineCells(lineStart[0],lineStart[1],x,y)) setCell(a,b,S.cur); lineStart=null; preview=null; }
+    if(S.tool==="draw"||S.tool==="erase"||S.tool==="line") afterChange();
+  };
+  cv.addEventListener("pointerup",up); cv.addEventListener("pointercancel",up);
+  cv.addEventListener("pointerleave",()=>{ if(!down) $("info").textContent=infoText(); if(S.tool==="text"){ preview=null; render(); } });
+
+  function infoText(){ const n=S.grid.filter(v=>v>=0).length; return `${S.w} × ${S.h} stitches · ${n.toLocaleString()} stitched`; }
+  function afterChange(){ render(); renderPalette(); $("info").textContent=infoText(); calc(); save(); }
+
+  // keyboard
+  document.addEventListener("keydown",e=>{
+    if(e.target.matches("input,textarea,select")) return;
+    if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="z"){ e.preventDefault(); (e.shiftKey?$("redo"):$("undo")).click(); return; }
+    if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="y"){ e.preventDefault(); $("redo").click(); return; }
+    const m={d:"draw",e:"erase",f:"fill",i:"pick",l:"line",h:"pan",t:"text"}[e.key.toLowerCase()]; if(m) setTool(m);
+    if(e.key==="Escape"&&S.tool==="text") setTool("draw");
+    if(e.key==="+"||e.key==="=") $("zoomIn").click(); if(e.key==="-") $("zoomOut").click();
+  });
+
+  // zoom
+  const ZOOMS=[4,6,8,10,12,14,16,20,24,30,36];
+  function setZoom(z){ S.zoom=z; $("zoomLbl").textContent=z+"px"; render(); save(); }
+  $("zoomIn").onclick=()=>setZoom(ZOOMS.find(z=>z>S.zoom)||S.zoom);
+  $("zoomOut").onclick=()=>setZoom([...ZOOMS].reverse().find(z=>z<S.zoom)||S.zoom);
+
+  // canvas settings
+  function syncDims(){ $("gw").value=S.w; $("gh").value=S.h; }
+  $("resize").onclick=()=>resizeTo(+$("gw").value||S.w, +$("gh").value||S.h);
+  function resizeTo(nw,nh){
+    nw=Math.max(5,Math.min(400,nw)); nh=Math.max(5,Math.min(400,nh));
+    if(nw===S.w&&nh===S.h) return;
+    pushUndo();
+    // keep design centered
+    const ox=Math.floor((nw-S.w)/2), oy=Math.floor((nh-S.h)/2);
+    const g=new Array(nw*nh).fill(-1);
+    for(let y=0;y<S.h;y++) for(let x=0;x<S.w;x++){ const nx=x+ox, ny=y+oy; if(nx>=0&&ny>=0&&nx<nw&&ny<nh) g[ny*nw+nx]=S.grid[y*S.w+x]; }
+    S.w=nw; S.h=nh; S.grid=g; syncDims(); afterChange();
+  }
+  $("clothColor").onchange=e=>{ S.cloth=e.target.value; render(); save(); };
+  $("showSym").onchange=render;
+  $("clearBtn").onclick=()=>confirmBox("Clear every stitch on the canvas?",()=>{ pushUndo(); S.grid.fill(-1); afterChange(); });
+
+  // ---------- image import ----------
+  $("imgFile").onchange=e=>{
+    const f=e.target.files[0]; if(!f) return;
+    const img=new Image();
+    img.onload=()=>{
+      const tw=Math.max(10,Math.min(300,+$("imgWidth").value||60));
+      const th=Math.max(1,Math.round(img.height/img.width*tw));
+      const oc=document.createElement("canvas"); oc.width=tw; oc.height=th;
+      const o=oc.getContext("2d"); o.imageSmoothingQuality="high"; o.drawImage(img,0,0,tw,th);
+      const d=o.getImageData(0,0,tw,th).data;
+      const k=Math.max(2,Math.min(40,+$("imgColors").value||8));
+      const px=[]; const idx=[];
+      for(let i=0;i<tw*th;i++){ if(d[i*4+3]<128){ idx.push(-1); continue; } idx.push(px.length); px.push([d[i*4],d[i*4+1],d[i*4+2]]); }
+      if(!px.length) return toast("That image is fully transparent");
+      // k-means++ init
+      const cents=[px[Math.floor(Math.random()*px.length)].slice()];
+      const dist=(a,b)=>(a[0]-b[0])**2+(a[1]-b[1])**2+(a[2]-b[2])**2;
+      while(cents.length<Math.min(k,px.length)){
+        let best=null,bd=-1; for(let t=0;t<200;t++){ const p=px[Math.floor(Math.random()*px.length)]; const md=Math.min(...cents.map(c=>dist(c,p))); if(md>bd){bd=md;best=p;} }
+        cents.push(best.slice());
+      }
+      const asg=new Int32Array(px.length);
+      for(let it=0;it<12;it++){
+        for(let i=0;i<px.length;i++){ let b=0,bd=Infinity; for(let c=0;c<cents.length;c++){ const dd=dist(px[i],cents[c]); if(dd<bd){bd=dd;b=c;} } asg[i]=b; }
+        const sum=cents.map(()=>[0,0,0,0]);
+        for(let i=0;i<px.length;i++){ const s=sum[asg[i]]; s[0]+=px[i][0]; s[1]+=px[i][1]; s[2]+=px[i][2]; s[3]++; }
+        sum.forEach((s,c)=>{ if(s[3]) cents[c]=[s[0]/s[3],s[1]/s[3],s[2]/s[3]]; });
+      }
+      // drop unused clusters
+      const used=[...new Set(asg)].sort((a,b)=>a-b); const remap=new Map(used.map((c,i)=>[c,i]));
+      pushUndo();
+      S.palette=used.map((c,i)=>({color:"#"+cents[c].map(v=>Math.round(v).toString(16).padStart(2,"0")).join(""),name:"Thread "+(i+1),symbol:SYMBOLS[i%SYMBOLS.length]}));
+      S.w=tw; S.h=th; S.grid=idx.map(i=>i<0?-1:remap.get(asg[i])); S.cur=0;
+      syncDims(); afterChange(); toast(`Pattern created: ${tw} × ${th}, ${S.palette.length} colors`);
+      e.target.value="";
+    };
+    img.onerror=()=>toast("Couldn't read that image");
+    img.src=URL.createObjectURL(f);
+  };
+
+  // ---------- text ----------
+  let stamp=null, txtAlign="center", buildId=0;
+  const capCache={};
+  function capRatio(font,weight){
+    const k=font+"|"+weight; if(capCache[k]) return capCache[k];
+    const c=document.createElement("canvas"); c.width=320; c.height=320;
+    const x=c.getContext("2d",{willReadFrequently:true});
+    x.font=`${weight} 200px "${font}"`; x.textBaseline="alphabetic"; x.fillText("H",20,270);
+    const d=x.getImageData(0,0,320,320).data; let top=-1,bot=-1;
+    for(let y=0;y<320;y++){ for(let xx=0;xx<320;xx++){ if(d[(y*320+xx)*4+3]>110){ if(top<0) top=y; bot=y; break; } } }
+    const r=top<0?0.7:(bot-top+1)/200;
+    if(document.fonts.check(`${weight} 20px "${font}"`)) capCache[k]=r;
+    return r;
+  }
+  function renderLine(str,font,weight,h,sp,thr){
+    const SAMPLE=h<=16?8:h<=36?4:2;
+    const fontPx=h*SAMPLE/capRatio(font,weight);
+    const c=document.createElement("canvas"); const x=c.getContext("2d",{willReadFrequently:true});
+    const f=`${weight} ${fontPx}px "${font}"`; x.font=f;
+    const chars=[...str];
+    const width = sp===0 ? x.measureText(str).width : chars.reduce((a,ch)=>a+x.measureText(ch).width,0)+sp*SAMPLE*Math.max(0,chars.length-1);
+    const pad=Math.ceil(fontPx*0.4/SAMPLE)*SAMPLE;
+    const base=Math.ceil(fontPx*1.3/SAMPLE)*SAMPLE;
+    c.width=Math.max(SAMPLE,Math.ceil((width+pad*2)/SAMPLE)*SAMPLE); c.height=Math.ceil((base+fontPx*0.6)/SAMPLE)*SAMPLE;
+    x.font=f; x.textBaseline="alphabetic"; x.fillStyle="#000";
+    if(sp===0) x.fillText(str,pad,base); else { let px=pad; for(const ch of chars){ x.fillText(ch,px,base); px+=x.measureText(ch).width+sp*SAMPLE; } }
+    const cols=c.width/SAMPLE, rows=c.height/SAMPLE, W=c.width;
+    const d=x.getImageData(0,0,c.width,c.height).data;
+    const cells=new Uint8Array(cols*rows); const full=255*SAMPLE*SAMPLE;
+    let x0=cols,y0=rows,x1=-1,y1=-1;
+    for(let r=0;r<rows;r++) for(let q=0;q<cols;q++){
+      let s=0;
+      for(let yy=0;yy<SAMPLE;yy++){ let o=((r*SAMPLE+yy)*W+q*SAMPLE)*4+3; for(let xx=0;xx<SAMPLE;xx++,o+=4) s+=d[o]; }
+      if(s/full>=thr){ cells[r*cols+q]=1; if(q<x0)x0=q; if(q>x1)x1=q; if(r<y0)y0=r; if(r>y1)y1=r; }
+    }
+    if(x1<0) return {w:0,h:h,cells:new Uint8Array(0)};
+    const w=x1-x0+1, hh=y1-y0+1, out=new Uint8Array(w*hh);
+    for(let r=0;r<hh;r++) for(let q=0;q<w;q++) out[r*w+q]=cells[(r+y0)*cols+q+x0];
+    return {w,h:hh,cells:out};
+  }
+  async function buildStamp(){
+    const id=++buildId;
+    const text=$("txt").value.replace(/\s+$/,""), font=$("txtFont").value, weight=$("txtBold").checked?700:400;
+    const h=Math.max(4,Math.min(80,+$("txtH").value||9)), sp=+$("txtSp").value||0, lg=Math.max(0,+$("txtLg").value||0);
+    const thr=[0.62,0.48,0.36,0.25,0.14][(+$("txtThick").value||3)-1];
+    try{ await document.fonts.load(`${weight} 40px "${font}"`, text||"H"); }catch(e){}
+    if(id!==buildId) return;
+    if(!text.trim()){ stamp=null; drawTxtPreview(); return; }
+    const lines=text.split("\n").map(l=>renderLine(l,font,weight,h,sp,thr));
+    const W=Math.max(1,...lines.map(l=>l.w));
+    const H=lines.reduce((a,l)=>a+l.h,0)+lg*(lines.length-1);
+    const cells=new Uint8Array(W*H); let oy=0;
+    for(const l of lines){
+      const ox= txtAlign==="left"?0 : txtAlign==="right"? W-l.w : Math.floor((W-l.w)/2);
+      for(let r=0;r<l.h&&l.w;r++) for(let q=0;q<l.w;q++) if(l.cells[r*l.w+q]) cells[(oy+r)*W+ox+q]=1;
+      oy+=l.h+lg;
+    }
+    stamp={w:W,h:H,cells};
+    drawTxtPreview();
+  }
+  function drawTxtPreview(){
+    const c=$("txtPrev"), x=c.getContext("2d");
+    if(!stamp){ c.width=1;c.height=1; $("txtInfo").textContent="Type some text above"; return; }
+    const z=Math.max(1,Math.min(6,Math.floor(216/stamp.w)));
+    c.width=stamp.w*z+2*z; c.height=stamp.h*z+2*z;
+    x.fillStyle=S.cloth; x.fillRect(0,0,c.width,c.height);
+    x.fillStyle=(S.palette[S.cur]||{color:"#000"}).color;
+    for(let r=0;r<stamp.h;r++) for(let q=0;q<stamp.w;q++) if(stamp.cells[r*stamp.w+q]) x.fillRect((q+1)*z,(r+1)*z,z,z);
+    const spi=currentSpi(), u=S.calc.unit, k=u==="cm"?2.54:1;
+    $("txtInfo").textContent=`${stamp.w} × ${stamp.h} stitches · about ${fmt(stamp.w/spi*k,u)} × ${fmt(stamp.h/spi*k,u)} on your fabric`;
+  }
+  let txtT; const rebuild=()=>{ clearTimeout(txtT); txtT=setTimeout(buildStamp,120); };
+  ["txt","txtFont","txtH","txtSp","txtLg","txtThick","txtBold"].forEach(id=>{ $(id).addEventListener("input",rebuild); $(id).addEventListener("change",rebuild); });
+  $("alignSeg").querySelectorAll("button").forEach(b=>b.onclick=()=>{ txtAlign=b.dataset.v; $("alignSeg").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b)); rebuild(); });
+  document.fonts.addEventListener && document.fonts.addEventListener("loadingdone",rebuild);
+
+  function stampCells(cx,cy){
+    const out=[]; const ox=cx-Math.floor(stamp.w/2), oy=cy-Math.floor(stamp.h/2);
+    for(let r=0;r<stamp.h;r++) for(let q=0;q<stamp.w;q++) if(stamp.cells[r*stamp.w+q]) out.push([ox+q,oy+r]);
+    return out;
+  }
+  function showStampPreview(x,y){ if(!stamp) return; preview=stampCells(x,y); render(); }
+  function stampAt(x,y){
+    if(!stamp) return toast("Type some text first");
+    if(!S.palette.length) return toast("Add a thread color first");
+    pushUndo(); let off=0;
+    for(const [a,b] of stampCells(x,y)){ if(a<0||b<0||a>=S.w||b>=S.h){off++;continue;} S.grid[b*S.w+a]=S.cur; }
+    preview=null; afterChange();
+    if(off) toast("Part of the text went past the edge. Undo, then place it again or enlarge the canvas.");
+  }
+  $("txtPlace").onclick=()=>{ if(!stamp) return toast("Type some text first"); setTool("text"); document.body.dataset.view="edit"; toast("Click on the pattern to place your text"); };
+  $("txtCenter").onclick=()=>{
+    if(!stamp) return toast("Type some text first");
+    if(stamp.w+4>S.w||stamp.h+4>S.h){ resizeTo(Math.max(S.w,stamp.w+10),Math.max(S.h,stamp.h+10)); toast("Canvas enlarged to fit the text"); }
+    stampAt(Math.floor(S.w/2),Math.floor(S.h/2));
+  };
+
+  // ---------- modals ----------
+  const modal=$("modal"), box=$("modalBox");
+  function openModal(html){ box.innerHTML=html; modal.classList.add("open"); }
+  function closeModal(){ modal.classList.remove("open"); }
+  modal.addEventListener("click",e=>{ if(e.target===modal) closeModal(); });
+  function confirmBox(msg,yes){
+    openModal(`<p style="margin:0 0 16px">${msg}</p><div class="row" style="justify-content:flex-end"><button class="btn" id="mNo" style="flex:0">Cancel</button><button class="btn primary" id="mYes" style="flex:0">OK</button></div>`);
+    $("mNo").onclick=closeModal; $("mYes").onclick=()=>{ closeModal(); yes(); };
+  }
+  function toast(m){ const t=$("toast"); t.textContent=m; t.classList.add("show"); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("show"),2200); }
+
+  $("exportBtn").onclick=async()=>{
+    const code=JSON.stringify(serialize(false));
+    try{ await navigator.clipboard.writeText(code); toast("Pattern code copied"); }
+    catch(e){ openModal(`<h3>Pattern code</h3><p class="note">Copy this text and keep it somewhere safe.</p><textarea readonly>${code}</textarea><button class="btn full" onclick="document.getElementById('modal').classList.remove('open')">Done</button>`); box.querySelector("textarea").select(); }
+  };
+  $("importBtn").onclick=()=>{
+    openModal(`<h3>Load a pattern</h3><p class="note">Paste a pattern code you copied earlier. This replaces the current pattern (you can undo).</p><textarea id="imp"></textarea><div class="row" style="margin-top:10px"><button class="btn" id="impNo">Cancel</button><button class="btn primary" id="impYes">Load</button></div>`);
+    $("impNo").onclick=closeModal;
+    $("impYes").onclick=()=>{ try{ const o=JSON.parse($("imp").value); pushUndo(); load(o); syncDims(); closeModal(); afterChange(); toast("Pattern loaded"); } catch(e){ toast("That code doesn't look right"); } };
+  };
+  $("chartBtn").onclick=()=>{
+    const z=Math.max(14,Math.min(24,Math.floor(2400/Math.max(S.w,S.h))));
+    const oc=document.createElement("canvas"); const o=oc.getContext("2d");
+    draw(o,z,{symbols:true,white:true});
+    const oc2=document.createElement("canvas"); const o2=oc2.getContext("2d");
+    draw(o2,z,{symbolOnly:true,white:true});
+    const ct=counts();
+    const key=S.palette.map((p,i)=>ct[i]?`<tr><td><span class="chip" style="display:inline-grid;background:${p.color};color:${lum(p.color)>0.55?'#000':'#fff'}">${p.symbol}</span></td><td>${p.name}</td><td>${ct[i].toLocaleString()}</td></tr>`:"").join("");
+    openModal(`<h3>Your chart</h3><p class="note">Right-click (or long-press) an image to save or print it.</p>
+      <p class="lbl" style="font-weight:600;margin:12px 0 4px">Color chart</p><img src="${oc.toDataURL()}">
+      <p class="lbl" style="font-weight:600;margin:12px 0 4px">Symbol-only chart (ink-friendly)</p><img src="${oc2.toDataURL()}">
+      <p class="lbl" style="font-weight:600;margin:12px 0 4px">Thread key</p>
+      <table><thead><tr><th>Symbol</th><th>Thread</th><th>Stitches</th></tr></thead><tbody>${key||'<tr><td colspan=3>No stitches yet</td></tr>'}</tbody></table>
+      <button class="btn full" onclick="document.getElementById('modal').classList.remove('open')">Close</button>`);
+  };
+
+  // ---------- calculator ----------
+  const FABRICS={"aida-11":["Aida 11",11,1],"aida-14":["Aida 14",14,1],"aida-16":["Aida 16",16,1],"aida-18":["Aida 18",18,1],"aida-20":["Aida 20",20,1],"aida-22":["Hardanger 22",22,1],
+    "even-25":["Evenweave 25",25,2],"even-28":["Evenweave 28",28,2],"even-32":["Linen 32",32,2],"even-36":["Linen 36",36,2],"even-40":["Linen 40",40,2]};
+  function seg(id,key,cb){ const el=$(id); el.querySelectorAll("button").forEach(b=>b.onclick=()=>{ const nv=isNaN(+b.dataset.v)?b.dataset.v:+b.dataset.v; if(nv===S.calc[key]) return; S.calc[key]=nv; syncSeg(id,key); cb&&cb(); calc(); save(); }); }
+  function syncSeg(id,key){ $(id).querySelectorAll("button").forEach(b=>b.classList.toggle("on",String(S.calc[key])===b.dataset.v)); }
+  seg("overSeg","over"); seg("srcSeg","src",()=>{$("manualRow").style.display=S.calc.src==="manual"?"flex":"none";});
+  seg("unitSeg","unit",()=>{ // convert margin to the new unit
+    const m=S.calc.unit==="cm"?S.calc.margin*2.54:S.calc.margin/2.54;
+    S.calc.margin=S.calc.unit==="cm"?Math.round(m*2)/2:Math.round(m*4)/4; $("margin").value=S.calc.margin;
+    unitLabels(); try{ drawTxtPreview(); }catch(e){} });
+  function unitLabels(){
+    const cm=S.calc.unit==="cm";
+    $("marginLbl").textContent=`Extra margin on each side (${cm?"cm":"inches"})`;
+    $("margin").step=cm?"0.5":"0.25";
+    $("marginNote").textContent=cm?"For framing or a hoop, 7.5 cm per side is a common choice; 5 cm is enough for small pieces.":"For framing or a hoop, 3 in per side is a common choice; 2 in is enough for small pieces.";
+    $("customLbl").textContent=cm?"Threads per cm":"Threads per inch";
+    $("customCount").value=cm?Math.round(S.calc.custom/2.54*10)/10:Math.round(S.calc.custom*10)/10;
+    document.querySelectorAll("#fabric option").forEach(o=>{
+      if(!o.dataset.base) o.dataset.base=o.textContent;
+      const f=FABRICS[o.value]; if(!f) return;
+      o.textContent=cm?`${o.dataset.base} (${(f[1]/2.54).toFixed(1)}/cm)`:o.dataset.base;
+    });
+  }
+  function currentSpi(){ const f=FABRICS[S.calc.fabric]; return (f?f[1]:S.calc.custom)/S.calc.over; }
+  $("fabric").onchange=e=>{ S.calc.fabric=e.target.value; const f=FABRICS[S.calc.fabric]; if(f) S.calc.over=f[2]; syncSeg("overSeg","over"); $("customRow").style.display=S.calc.fabric==="custom"?"flex":"none"; calc(); save(); };
+  $("customCount").oninput=e=>{ const v=+e.target.value; if(!v) return; S.calc.custom=S.calc.unit==="cm"?v*2.54:v; calc(); save(); };
+  $("mw").oninput=e=>{ S.calc.mw=+e.target.value||0; calc(); save(); };
+  $("mh").oninput=e=>{ S.calc.mh=+e.target.value||0; calc(); save(); };
+  $("margin").oninput=e=>{ S.calc.margin=Math.max(0,+e.target.value||0); calc(); save(); };
+
+  function patternSize(){
+    if(S.calc.src==="manual") return [S.calc.mw,S.calc.mh];
+    if(S.calc.src==="used"){
+      let x0=Infinity,y0=Infinity,x1=-1,y1=-1;
+      for(let y=0;y<S.h;y++) for(let x=0;x<S.w;x++) if(S.grid[y*S.w+x]>=0){ x0=Math.min(x0,x);y0=Math.min(y0,y);x1=Math.max(x1,x);y1=Math.max(y1,y); }
+      return x1<0?[0,0]:[x1-x0+1,y1-y0+1];
+    }
+    return [S.w,S.h];
+  }
+  const fmt=(v,u)=>u==="in"?(Math.round(v*100)/100)+"″":(Math.round(v*10)/10)+" cm";
+  const roundUp=(v,u)=>u==="in"?Math.ceil(v*2-1e-9)/2:Math.ceil(v-1e-9);
+  function sizes(count,over,sw,sh){
+    const spi=count/over; const u=S.calc.unit; const k=u==="cm"?2.54:1;
+    const dw=sw/spi*k, dh=sh/spi*k; const cw=dw+2*S.calc.margin, ch=dh+2*S.calc.margin;
+    return {spi,dw,dh,cw,ch,rw:roundUp(cw,u),rh:roundUp(ch,u)};
+  }
+  function calc(){
+    const [sw,sh]=patternSize(); const u=S.calc.unit;
+    const f=FABRICS[S.calc.fabric]; const count=f?f[1]:S.calc.custom; const over=S.calc.over;
+    const r=sizes(count,over,sw,sh);
+    $("rStitches").textContent=`${sw} × ${sh} stitches`;
+    const pi=Math.round(r.spi*100)/100, pc=Math.round(r.spi/2.54*100)/100;
+    $("rDensity").textContent=u==="cm"?`${pc} stitches per cm (${pi} per inch)`:`${pi} stitches per inch (${pc} per cm)`;
+    try{ drawTxtPreview(); }catch(e){}
+    $("rDesign").textContent=`${fmt(r.dw,u)} × ${fmt(r.dh,u)}`;
+    $("rCut").textContent=`${fmt(r.rw,u)} × ${fmt(r.rh,u)}`;
+    $("rCutExact").textContent=`Exact: ${fmt(r.cw,u)} × ${fmt(r.ch,u)} with ${fmt(S.calc.margin,u)} margin per side`;
+    const tb=$("cmp").querySelector("tbody"); tb.innerHTML="";
+    for(const [key,[name,c,ov]] of Object.entries(FABRICS)){
+      const x=sizes(c,ov,sw,sh);
+      const tr=document.createElement("tr"); if(key===S.calc.fabric&&over===ov) tr.className="sel";
+      tr.innerHTML=`<td>${name}${ov===2?" <span style='color:var(--muted)'>/2</span>":""}</td><td>${fmt(x.dw,u)} × ${fmt(x.dh,u)}</td><td>${fmt(x.rw,u)} × ${fmt(x.rh,u)}</td>`;
+      tr.style.cursor="pointer"; tr.onclick=()=>{ $("fabric").value=key; $("fabric").onchange({target:$("fabric")}); };
+      tb.appendChild(tr);
+    }
+  }
+
+  // mobile tabs
+  document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{ document.body.dataset.view=b.dataset.view; document.querySelectorAll(".tabs button").forEach(x=>x.classList.toggle("on",x===b)); });
+
+  // init
+  syncDims(); $("clothColor").value=S.cloth; $("zoomLbl").textContent=S.zoom+"px";
+  $("fabric").value=S.calc.fabric; $("customRow").style.display=S.calc.fabric==="custom"?"flex":"none";
+  unitLabels(); $("mw").value=S.calc.mw; $("mh").value=S.calc.mh; $("margin").value=S.calc.margin;
+  syncSeg("overSeg","over"); syncSeg("srcSeg","src"); syncSeg("unitSeg","unit");
+  $("manualRow").style.display=S.calc.src==="manual"?"flex":"none";
+  renderPalette(); afterChange(); buildStamp();
+})();
+</script>
+</body>
+</html>
